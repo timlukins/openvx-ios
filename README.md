@@ -14,8 +14,6 @@ Lib
 
 The '/lib' directory contains the pre-built frameworks for use of the OpenVX SDK. (The intention is to later provide Carthage and/or CocoaPods support for these frameworks as well.)
 
-Consult VERSION.txt to confirm the bundled libraries release.
-
 **NOTE: due to the nature of iOS support for dynamic "embedded" frameworks, only iOS 8.0 or above can be developed for the App Store. Earlier versions of iOS for Ad Hoc deployment are possible.**
 
 To include the core framework in your project - *statically link* the OpenVX.framework by adding it to the "Linked Frameworks and Libraries" list. This provides the main structures, memory management and dynamic loading capabilities of OpenVX.
@@ -70,7 +68,6 @@ The '/vxview' directory contains the XCode project for VXView. VXView is an exam
 
 To start in XCode simply select the `vxview.xcodeproj`. 
 
-A more detailed walkthrough of the design of the App is [detailed on the Machines With Vision blog](http://www.machineswithvision.com/build-invx-ios/).
 
 Issues
 ------
