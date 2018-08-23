@@ -7,8 +7,6 @@ This enables the development of [OpenVX](http://machineswithvision.com/learn-abo
 
 The SDK comprises a tailored iOS build of the core OpenVX framework, alongside the default *C*, *extras*, and accelerated *InVX* target backends. Also included is an example OpenVX application: VXView ([the same one as is on the Apple App Store.](https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=979376440&mt=8)).
 
-**NOTE: Currently not all OpenVX 1.0 kernels are accelerated in InVX or are fully tested.**
-
 This README file is intended to give more specific technical information to aid developers to get this integrated with their own projects.
 
 Lib
