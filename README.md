@@ -3,6 +3,8 @@ OpenVX for iOS Version 1.0.0
 
 This enables the development of [OpenVX](http://machineswithvision.com/learn-about-openvx/) applications for iOS devices. 
 
+**It was developed from work undertaken in 2015 and is placed here for historic reasons for now and in the public domain.**
+
 The SDK comprises a tailored iOS build of the core OpenVX framework, alongside the default *C*, *extras*, and accelerated *InVX* target backends. Also included is an example OpenVX application: VXView ([the same one as is on the Apple App Store.](https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=979376440&mt=8)).
 
 **NOTE: Currently not all OpenVX 1.0 kernels are accelerated in InVX or are fully tested.**
