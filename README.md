@@ -1,5 +1,5 @@
-OpenVX for iOS Version 1.0.0
-==============================
+OpenVX for iOS
+================
 
 This enables the development of [OpenVX](http://machineswithvision.com/learn-about-openvx/) applications for iOS devices. 
 
