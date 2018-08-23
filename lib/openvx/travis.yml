@@ -1,0 +1,62 @@
+# ##############################################################################
+#                           InVX Travis CI Build File
+# ##############################################################################
+# This is the 'development' branch!
+# NOTE: the only difference between this and the same file on 'master' should
+# be the uncommenting of the "deploy" phase in order to package up all resulting
+# build artefacts and publish them as a github release.
+# ##############################################################################
+# Note that this is effectively just a main script that simply calls
+# each respective "travis-script.sh" in each build-* folder in turn.
+# The idea is that each build will then produce its own build artefacts
+# in its folder to be combined and packaged up.
+# ##############################################################################
+# NOTE: if any build fails for a particular architecture - they all fail! 
+# ##############################################################################
+# For RaspPI we might need a Ubuntu environment within:
+# http://penandpants.com/2014/03/09/docker-via-homebrew/
+
+# Language (actually just defines us running on MacOS)
+language: objective-c
+
+# Xcode 7 Image!
+osx_image: xcode7
+
+# Apparently this is how to add support for multiple OS's
+# NOT CURRENTLY ENABLED PER REPO
+# http://blog.travis-ci.com/2014-05-13-multi-os-feature-available/
+#os: 
+#  - osx
+
+# Unecessary for objective-c (implicitly MacOS)
+# compiler: 
+#  - clang 
+
+# Create build environment
+# Best practice to use xctool... 
+# http://stackoverflow.com/questions/19607894/how-to-get-travis-ci-to-build-and-test-xcode-projects-hosted-on-github
+# Apparently xctool there by default...
+#before_install:
+#    - brew update
+#    - brew install xctool
+
+# before_script:
+#  - cd build-macos
+
+script:
+    - cd build-ios
+    - ./travis-script.sh
+    - cd ..
+
+#before-deploy:
+#  - ./package.sh
+
+# For artifact info: http://stackoverflow.com/questions/12643018/how-to-get-travis-ci-build-number-within-after-script-command
+# Push this back to github release...
+#deploy:
+#  provider: releases
+#  api_key: "GITHUB OAUTH TOKEN"
+#  file: "FILE TO UPLOAD"
+#  skip_cleanup: true
+#  on:
+#    tags: true

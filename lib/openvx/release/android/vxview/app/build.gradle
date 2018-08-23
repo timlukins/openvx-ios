@@ -1,0 +1,54 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "com.machineswithvision.vxview"
+        minSdkVersion 8
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+        renderscriptTargetApi 20
+        renderscriptSupportModeEnabled true
+    }
+
+    sourceSets.main {
+        jniLibs.srcDir 'src/main/libs'
+        jni.srcDirs = [] //disable automatic ndk-build call
+    }
+
+    // call regular ndk-build(.cmd) script from app directory
+    task ndkBuild(type: Exec) {
+        println 'Inside task ndkBuild'
+        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            println 'calling ndk-build.cmd'
+            commandLine "/usr/local/Cellar/android-ndk/r10d/ndk-build.cmd", '-C', file('src/main/jni').absolutePath
+            println 'done'
+        } else {
+            println 'ndk-build'
+            commandLine "/usr/local/Cellar/android-ndk/r10d/ndk-build", '-C', file('src/main/jni').absolutePath
+            println 'done'
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        compileTask -> compileTask.dependsOn ndkBuild
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile files('src/main/invx/java/invx.jar')
+}

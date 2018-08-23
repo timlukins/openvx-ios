@@ -1,0 +1,81 @@
+## For an example see here: https://circleci.com/docs/config-sample
+## Another nice one here: http://blog.javascripting.com/2014/12/05/continuous-deployment-with-github-circleci-heroku/
+
+machine:
+  xcode:
+    version: "7.0"
+ 
+  # Find out what version we are building... 
+  # Add current dir to path so able to invoke scripts
+  environment:
+    PATH: ${PATH}:.
+
+general:
+  # White list of branches that will trigger this build.
+  # NOT really recommended practice sometimes (ie. should build everything)
+  #      - /feature-.*/ # can use regexes
+  branches:
+    only:
+      - master
+      - development
+
+  # Specify output artifact here (rather than copy to CIRCLE_ARIFACTS)
+  #artifacts:
+  #  - "InVX.zip" # relative to the build directory
+
+#dependencies:
+#  pre:
+#    - gem install xcpretty 
+
+test:
+  override:
+
+    - install-keychain.sh:
+        pwd:
+          build-ios
+
+    - build-script.sh:
+        pwd:
+          build-ios
+
+    - uninstall-keychain.sh:
+        pwd:
+          build-ios
+
+    # copy the test results to the test results directory
+    # Could be in the script, but this is more explict 
+    - cp ./build-ios/testresults.xml $CIRCLE_TEST_REPORTS/testresults.xml
+
+    # Copy the build libraries into release folder
+    - cp -r ./build-ios/InVX/* release/ios/invx/. 
+    #- cp -r build-android/lib/* release/android/
+   
+    # Rename release to match version
+    - mv release invx-$INVX_VERSION-$CIRCLE_BUILD:
+        environment:
+          INVX_VERSION: $(cat VERSION)
+    
+    # Zip and it all up to create one artifact (with version & build num)
+    - zip -r $CIRCLE_ARTIFACTS/invx-$INVX_VERSION-$CIRCLE_BUILD_NUM.zip invx-$INVX_VERSION-$CIRCLE_BUILD/:
+        environment:
+            INVX_VERSION: $(cat VERSION)
+
+# Can override deployment to also push to github
+# https://medium.com/@jgautheron/publish-your-golang-binaries-in-github-with-circleci-e0b64cb21bf8#.4nt6rq9yf
+# Actually use: https://github.com/aktau/github-release
+# TODO: trigger this only on tag matching release-XXX ?
+# NOTE: currently just working on pushes to master and reuses build artifact...
+
+deployment:
+  release:
+    branch: master 
+    commands:
+
+      # This is written in go (could move to machine step)
+      - go get github.com/aktau/github-release 
+   
+      # Note: picks up GITHUB_TOKEN from env
+      - github-release upload --user $CIRCLE_PROJECT_USERNAME --repo $CIRCLE_PROJECT_REPONAME --name "InVX" --description "Accelerated OpenVX for mobile." --tag `git describe --tags` $CIRCLE_ARTIFACTS/*.zip
+  
+## Notify any other web-hooks
+##notify:

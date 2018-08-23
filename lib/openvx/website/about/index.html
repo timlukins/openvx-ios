@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>InVX: fast computer vision for mobile.</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../css/landing-page.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Google Analytics -->
+
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	  ga('create', 'UA-61210800-2', 'auto');
+	  ga('send', 'pageview');
+
+	</script>
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container topnav">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+                <a class="navbar-brand topnav" href="#">
+                    <span><img src="../img/mwv-invx.png"><img src="../img/invx.png"></span> 
+                </a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+                <li class="hidden">
+                <a href="#top"></a>
+                </li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+    </nav>
+
+    <!-- Header -->
+
+<div class="intro-header">
+<div class="container">
+<div class="col-lg-8 col-lg-offset-2">
+
+<h2>
+Learn About Openvx
+</h2>
+<img src="/img/OpenVX.png" style="height:50px" align="right"></img>
+
+<p class="tagline">Portable, Power-efficient Vision Processing.</p>
+
+<p>
+Low cost cameras, powerful mobile computers and breakthroughs in vision algorithms are enabling new and enhanced products that understand the world around them. The challenge to fully realising this potential is maximising performance over a diverse range of computing platforms. Reasonable performance can usually be attained by optimising for a particular platform but at the expense of significant effort and loss of portability.    
+</p>
+
+<p>
+<b>OpenVX</b> has been developed to address these challenges. It is an open, royalty-free standard for cross platform acceleration of computer vision applications. The standard is overseen by the Khronos Group and has been developed by a large consortium of industry partners. The main site - with a more detailed overview - can be found at <a href="https://www.khronos.org/openvx/">https://www.khronos.org/openvx/</a> and there is also an accompanying overview <a href="https://www.khronos.org/assets/uploads/developers/library/overview/openvx-overview.pdf">slide-set [PDF]</a> as well. 
+
+<p>
+In summary, here are some of the key features of OpenVX: 
+</p>
+
+<ul id="list">
+	<li>Designed for low-power, real-time applications.</li>
+	<li>Specifically targeted at mobile, embedded computing platforms.</li>
+	<li>Supports portable application code with a standardised API and implementation conformance tests.</li>
+	<li>Hides low level implementation details in an increasingly heterogeneous platform landscape.</li>  
+	<li>Algorithms can be expressed as graphs allowing significant optimisation when mapping onto hardware.</li>
+</ul>
+<br>
+
+<p class="tagline">Here and now.</p>
+
+<p>
+OpenVX version 1.0 has only recently (as of the end of October 2014) been ratified. The complete specification is <a href="https://www.khronos.org/registry/vx/specs/1.0/html/index.html">now available</a>. 
+
+Following this, OpenVX drivers will now be provided by hardware manufacturers for an increasing number of platforms. Some of the most exciting are:
+
+<ul id="list">
+
+	<li>Nvidia's implementation of OpenVX built on-top of CUDA (powered by the upcoming Tegra K1 processor). Here is a slide-set with a <a href="http://on-demand.gputechconf.com/gtc/2014/presentations/S4714-nvidia-vision-toolkit-adas-photography.pdf">great example of tracking code written in OpenVX [PDF]</a>. 
+	<li>Google's <a href="https://www.google.com/atap/project-tango/">project Tango</a>, powered by Movidius' <a href="http://www.movidius.com/our-technology/myriad1/">Myriad 1 vision processor</a>.
+	<li>Videantis' <a href="http://www.videantis.com/products/processor-ip">v-MP4000HDX Chip technology</a>.
+
+</ul>
+<br>
+
+<p>
+<b>However, if you are interested in exploring and benefiting from OpenVX today your options are limited until wider adoption. Especially if you want to target existing mobile platforms such as Android and iOS, or IoT linux devices (such as the Raspberry Pi).</b> 
+
+<p>Machines with Vision is raising awareness of OpenVX and supporting developers by providing software implementations of the API that take advantage of hardware acceleration on these platforms. Please check out our <a href="/invx-sdk">InVX SDK</a> if you want to deploy OpenVX technology, starting today, for mobile and IoT.
+
+<p>
+We are excited about OpenVX since we think it addresses a fundamental need for a <b>unified, standardised framework for deploying embedded computer vision algorithms</b>. This makes it applicable not just for mobile and embedded devices - but ultimately for vehicles, robotics, drones, and anything else which has sensors and a requirement to process visual information quickly and efficiently. 
+
+</p>
+
+<p class="tagline">Impatient? Get started.</p>
+
+<p>Apart from Khronos themselves, the embedded vision community is well represented in industry by the <a href="http://www.embedded-vision.com">Embedded Vision Alliance</a>. A number of conferences and workshops also feature regularly in the more academic areas of research (<a href="http://cvisioncentral.com/promotion/evw2014/">for example</a>).
+</p>
+</p>
+<p> There is already a sample implementation of OpenVX available from Khronos - but if you would  like to develop on MacOS we have taken the opportunity to package it up via <code>homebrew</code> allowing you to install it easily <a href="https://github.com/machineswithvision/homebrew-openvx">here</a>. We have also taken the time to write a quick start introduction <a href="/openvx-quick-start/">to writing your first OpenVX program</a> based on this.
+
+</div>
+</div>
+</div>
+
+    <!-- Footer -->
+
+    <footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10">
+                <ul class="list-inline">
+                </ul>
+                <p class="copyright text-muted small">Copyright &copy; Machines with Vision Ltd. All Rights Reserved</p>
+                <p class="text-muted small">OpenVX and the OpenVX logo are trademarks of the Khronos Group Inc.</p>
+                <p class="text-muted small">REGISTERED IN SCOTLAND AS: SC515025. REGISTERED OFFICE: 7/9 NORTH SAINT DAVID STREET, EDINBURGH, EH2 1AW.</p>
+                    
+            </div>
+            <div class="col-lg-2">
+                <p>
+                    <a href="http://www.machineswithvision.com" class="">
+                        <span><img src="../img/mwv.png"></img></span> 
+                    </a>
+            </div>
+        </div>
+    </div>
+    </footer>
+
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

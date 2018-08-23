@@ -1,0 +1,150 @@
+---
+title: Building an Android App with InVX.
+---
+
+<div class="container">
+<div class="post">
+<div class="col-lg-8 col-lg-offset-2">
+	
+<h1>
+Building an Android App with InVX
+</h2>
+
+
+<p class="tagline">Introduction</p>
+
+<p>The source code for our visual effects example application, VXView, is provided in the InVX SDK to demonstrate how to utilise InVX in your own Android apps. In this blog post we’ll run through the steps needed to build and run VXView from source code and then explain some of the main features so that you can get started building you own InVX applications. We’ve open sourced the VXView source code so you can use this as a starting point for your own app if you don’t want to start from scratch.
+</p>
+
+<p class="tagline">Building and Running VXView</p>
+
+<p>Building and running VXView is very straightforward. We recommend you use the latest version of Android Studio.</p>
+
+<ul>
+<li>First download the VXView source code and InVX SDK from the our Github repository invx-sdk-android.</li>
+<li>Inside the invx-sdk-android directory you’ll find an invx sub-directory. Copy the invx directory to vxview/app/src/main</li>
+<li>Inside the invx directory you have just copied there is a sub-directory called ‘res' and inside this there is a sub-directory ‘raw'. Copy the directory ‘raw' to vxview/app/src/main/res</li>
+<li>Now start Android Studio and open the vxview directory (File->Open…)</li>
+<li>Either connect a device to your development machine using a USB cable or prepare an Android Virtual Device for testing.</li>
+<li>You can now simply run the project. This will build the application, install it on your device or emulator and run it.</li>
+</ul>
+
+<p class="tagline">Anatomy of an InVX Android App</p>  
+
+<p><b>OpenVX Context Lifecycle</b></p>
+
+<p>All OpenVX functions must be called within an OpenVX context. Before any OpenVX functions are called the context must be created and after all OpenVX functions have been finished the context must be released. Here is a very simple code example:</p>
+
+{% highlight c%}
+#include "VX/vx.h"
+
+vx_context context = vxCreateContext();
+// ...
+// OpenVX functions are called here 
+// ...
+vxReleaseContext(&context);
+{% endhighlight %}
+
+<p>In a “live camera” Android application the OpenVX context only needs to be available whilst the Activity managing the camera is running (assuming that the activity behaves properly and stops the camera when it stops running). Creating and releasing OpenVX contexts has some overhead so it’s not a good idea to create and release the context for every frame to be processed. Android Activities have a <a href="http://developer.android.com/reference/android/app/Activity.html">Lifecycle model</a> with methods that are called during transitions from one lifecycle state to another. Just before an Activity runs Android called the Activity's <code>onResume()</code> method so we recommend creating the OpenVX context here. Just after an Activity has stopped running Android calls the Activity’s <code>onPause()</code> method so we recommend releasing the OpenVX context here.</p> 
+
+<p>OpenVX is a C API but the Android Activity is Java so we use the Java Native Interface (JNI) and the Android Native Development Kit (NDK) to link these parts together. The two code samples below outline how the OpenVX context management works in VXView</p> 
+
+<code>CameraActivity.java</code>
+{% highlight c %}
+public class CameraActivity extends Activity {
+
+    /**
+    * Declaration of methods that will be implemented in native code
+    */ 
+    public static native void createVXContext();
+    public static native void releaseVXContext();
+
+    /**
+    * Load the native code that implements the native methods
+    */
+    static {
+        System.loadLibrary(“vxview");
+    }
+
+    protected void onResume() {
+        super.onResume();
+        // We are about to start the camera so first we need to create the OpenVX context
+        createVXContext();
+        // … start the camera here
+    }
+
+    protected void onPause() {
+        super.onPause();
+        // …. stop the camera here
+        // The camera how now stopped so we can release the OpenVX context
+        releaseVXContext();
+}
+{% endhighlight %}
+
+<code>CameraActivity.c</code>
+
+{% highlight c %}
+vx_context context = 0;
+
+JNIEXPORT void JNICALL Java_com_machineswithvision_vxview_CameraActivity_createVXContext(JNIEnv *env, jclass cls)
+{
+    context = vxCreateContext();
+}
+
+JNIEXPORT void JNICALL Java_com_machineswithvision_vxview_CameraActivity_releaseVXContext(JNIEnv *env, jclass cls)
+{
+    // Release all of the resources dependant upon the context
+    if (context) {
+        vxReleaseContext(&context);
+        context = 0;
+    }
+}
+{% endhighlight %}
+
+<p><b>Capturing and Processing Preview Frames</b></p>
+
+<p>When the Camera device is running and a Camera.PreviewCallback object has been registered the <code>onPreviewFrame(…)</code> method of the <code>Camera.PreviewCallback</code> object is called as each frame becomes available. The callback provides the raw image bytes in YUV format (NV21). For greyscale image processing this is very convenient as the first width x height bytes is the luminance data which can be processed directly. The most efficient way to pass data between the Java application and the native code is to use directly allocated <code>ByteBuffers</code>. </p> 
+
+<p>The following two code samples outline how image data provided by the camera preview callback is passed to native code for processing with OpenVX</p>.
+
+<code>CameraActivty.java</code>
+{% highlight c%}
+public class CameraActivity extends Activity {
+
+   /**
+    * Declaration of methods that will be implemented in native code
+    */ 
+    public static native void processBytes(ByteBuffer buffer, int width, int height);
+
+    public void onPreviewFrame(byte[] yuv, Camera camera) {
+        imageBuffer = ByteBuffer.allocateDirect(preWidth*preHeight);
+        imageBuffer.clear();
+        imageBuffer.put(yuv, 0, preWidth * preHeight);
+        processBytes(imageBuffer, preWidth, preHeight);
+    }
+}
+{% endhighlight %}
+
+<code>CameraActivity.c</code>
+{% highlight c %}
+JNIEXPORT void JNICALL Java_com_machineswithvision_vxview_CameraActivity_processBytes
+(JNIEnv *env, jclass cls, jobject buffer, jint width, jint height)
+{
+    void* bytes = (*env)->GetDirectBufferAddress(env,buffer);
+    // Copy the pass image data to the input image buffer
+    memcpy(inputBuffer, bytes, width*height*sizeof(vx_uint8));
+    // Execute the OpenVX graph. 
+    vx_status status = vxProcessGraph(graph);
+    ...
+}
+{% endhighlight %}
+
+<p>Note that the Android Activity lifecycle methods and the camera preview callback are all called by the same thread so there is no need to add in synchronization. If you hand-off processing to worker threads you may wish to consider adding sychronization so that changes to context and other state cannot happen whilst frames are being processed.</p>
+
+
+
+
+</div>
+</div>
+</div>
+</section>

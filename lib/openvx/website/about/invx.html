@@ -1,0 +1,367 @@
+---
+title: The InVX SDK
+---
+
+<div class="container">
+	<div class="post">
+		<div class="col-lg-8 col-lg-offset-2">
+
+			<h1> <img src="/img/mwv-invx.png" class="" width="75" height="75"></img> InVX </h1>
+
+			<p class="tagline">Hardware Accelerated OpenVX Development for Android, iOS and Raspberry&nbsp;Pi</p>
+
+			<div class="alphapanel img-rounded">
+				<div class="row">	
+
+					<div class="col-md-4">
+						<h2 class="light">Learn</h2>
+						<p>
+						OpenVX is a new industry standard for high performance embedded vision. 
+						Click below to find out more. 
+						</p><p> 
+						<a href="/learn-about-openvx"><i class="fa fa-book fa-3x"></i></a>
+						</p>
+
+					</div> <!-- col -->
+
+					<div class="col-md-4">
+						<h2 class="light">Try</h2>
+						<p>
+						You can experience accelerated OpenVX running on a smartphone without doing any coding. We have published a simple demonstration app for both Android and iOS - just click below to go to the stores. 
+						</p>
+						<p>
+						<a href="https://play.google.com/store/apps/details?id=com.machineswithvision.vxview"><i class="fa fa-android fa-3x"></i></a>
+						<a href="https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=979376440&mt=8"><i class="fa fa-apple fa-3x"></i></a>
+						</p>
+					</div> <!-- col -->
+
+					<div class="col-md-4">
+						<h2 class="light">Watch</h2>
+						<p>
+						Even simpler - we've uploaded a video of the demonstration app to YouTube - just click below to watch it.
+						</p> 
+						<p>
+						<a href="https://www.youtube.com/watch?v=W3opnSiru2Q&feature=youtu.be"><i class="fa fa-youtube fa-3x"></i></a>
+						</p> 
+					</div> <!-- col -->
+				</div> <!-- row -->
+			</div> <!-- alphapanel -->
+
+			<p>InVX is our freely available SDK for developing OpenVX applications. Hardware vendors will be providing OpenVX drivers for an increasing number of platforms but these are not available today so there is a problem if you wish to start developing high performance, portable vision applications right now.
+			</p>
+
+			<p>We have developed InVX to solve this problem. InVX is a software implementation of the API that uses platform specific hardware acceleration to get performance. The implementation is built on top of Khronos Group's sample implementation of the API but with platform specific acceleration and other optimisations provided by us. 
+			</p>
+
+			<p>InVX is the first implementation of hardware accelerated OpenVX for mass market smartphones and IoT platforms. We use InVX in-house ourselves to build great <a href="/solutions">solutions</a> for customers who out-source their computer vision development to us. 
+			</p>
+
+			<p class="tagline">Download & Support</p>
+
+			<p>The table below provides full details of supported platforms, with download links to our Github repositories and links to support for reporting bugs, issues and requests. 
+			</p>
+
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>Supported OS</th>
+						<th>Supported Hardware</th>
+						<th>Download</th>
+						<th>Support</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Android 2.2+</td>
+						<td>armeabi-v7a</td>
+						<td><a href="https://github.com/machineswithvision/invx-sdk-android"><i class="fa fa-github"></i></a></td>
+						<td><a href="https://github.com/machineswithvision/invx-sdk-android/issues"><i class="fa fa-github"></i></a></td>
+					<tr>
+						<td>iOS 8.3+</td>
+						<td>armv7, armv7s, arm64</td>
+						<td><a href="https://github.com/machineswithvision/invx-sdk-ios"><i class="fa fa-github"></i></a></td>
+						<td><a href="https://github.com/machineswithvision/invx-sdk-ios/issues"><i class="fa fa-github"></i></a></td>
+					</tr>
+					<tr>
+						<td>Raspbian (wheezy-3.18) </td>
+						<td>armhf</td>
+						<td><a href="https://github.com/machineswithvision/invx-sdk-raspi"><i class="fa fa-github"></i></a></td>
+						<td><a href="https://github.com/machineswithvision/invx-sdk-raspi/issues"><i class="fa fa-github"></i></a></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<p>The InVX libraries are currently free to use and deploy. Technical support, feature requests and full custom development can be arranged by <a href="/contact">contacting us</a> to discuss your requirements and the commercial terms.
+
+			<p>InVX is currently distributed unrestricted in binary form under the terms of the MIT licence (found in the <code>./invx/LICENCE.txt</code> file in the Github repositories). 
+			
+			<p class="tagline">Compatibility & Acceleration Status</p>
+
+			<p>InVX has not been conformance tested against the OpenVX specification so we do not claim 100% compatible with OpenVX today but we do carry out extensive testing of our implementation. We plan to address this in the future. We expect InVX to eventually be superceded by hardware vendor OpenVX drivers but this make take many years so if users of InVX have a requirement for full OpenVX compliance they should contact us. Each release of InVX includes <b>a fully built version of the OpenVX 1.0 sample implementation</b> (often referenced as <code>libopenvx-c_model</code>) which means it provides complete coverage of the API.</p>
+
+
+			<p>In the table below we report on which of the base OpenVX vision functions <b>that have been hardware accelerated in the latest releases of InVX</b>. We are planning to add measurements of the speed-up with have seen over the non-accelerated Khronos sample implementation in due course.</p>
+
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>OpenVX 1.0 Base Functions</th>
+						<th>Android 1.0.0 InVx</th>
+						<th>iOS 1.0.0 InVx</th>
+						<th>Raspberry Pi 1.0.0 InVx</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>AbsDiff</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Accumulate</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>AccumulateSquared</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>AccumulateWeighted</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Add</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>And</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Box3x3</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>CannyEdgeDetector</td>
+						<td style="text-align: center"><i class="fa fa-check"></i></td>
+						<td style="text-align: center"><i class="fa fa-check"></i></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>ChannelCombine</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>ChannelExtract</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>ColorConvert</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>ConvertDepth</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Convolve</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Dilate3x3</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>EqualizeHistogram</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Erode3x3</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>FastCorners</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Gaussian3x3</td>
+						<td></td>
+						<td style="text-align: center"><i class="fa fa-check"></i></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>HarrisCorners</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>HalfScaleGaussian</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Histogram</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>IntegralImage</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>TableLookup</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Magnitude</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>MeanStdDev</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Median3x3</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>MinMaxLoc</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Multiply</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Not</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>OpticalFlowLK</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Or</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Phase</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					<tr>
+							<td>GaussianPyramid</td>
+							<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+							<td>Remap</td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>ScaleImage</td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>Sobel3x3</td>
+							<td style="text-align: center"><i class="fa fa-check"></i></td>
+							<td></td>
+							<td style="text-align: center"><i class="fa fa-check"></i></td>
+						</tr>
+						<tr>
+							<td>Subtract</td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>Threshold</td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>WarpAffine</td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>WarpPerspective</td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+						<td>XOr</td>
+						<td></td>
+							<td></td>
+							<td></td>
+					</tr>
+				</tbody>
+			</table>
+
+
+		</div>
+	</div>
+</div>
+

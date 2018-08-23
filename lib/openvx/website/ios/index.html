@@ -1,0 +1,351 @@
+---
+title: Building an iOS OpenVX App with InVX
+---
+
+<div class="container">
+<div class="post">
+<div class="col-lg-8 col-lg-offset-2">
+	
+<h1>
+Building an iOS OpenVX App with the InVX SDK
+</h1>
+
+<p class="tagline">Accelerated Vision for iPhone</p>
+
+<div class="img-with-text">
+<p><img width="300px" src="/blog/img/canny-mandrill.jpg">
+<small>[The App test image showing detected edges...]</small>
+</div>
+
+
+<h2>Introduction</h2>
+
+<p>In this post we describe more fully the demonstration App <b>VxView</b> that accompanies our InVX SDK. More specifically, we want to go into the nuts-and-bolts of how this is achieved on iOS and to illustrate the simplest possible OpenVX program: one that finds edges using the Canny edge detection filter and displays them overlaid on the video. If you haven't already seen it or tried it - just go to the <a href="/invx">main InVX page</a> and have a go.
+
+<p>Because OpenVX is such a new technology the biggest stumbling block in our experience is simply in knowing how it can be integrated with the video and display technologies on the specific platforms. This is mainly a problem because - rightly enough for a generic framework - OpenVX does not concern itself with image or video access, nor even a simple way to display results (<i>c.f.</i> that with the <code>highgui</code> module of the OpenCV library). Consequently we need to understand explicitly how to get data in and out of OpenVX as efficiently as possible. 
+
+<p>Our intention here then is simply to give a flavour of how to "wrap up" and develop OpenVX algorithms, which will (thanks to InVX) then have the potential to run as fast as possible on the actual device. To this end, our post is not a complete walk-through of the code (which is hopefully fairly readable), but instead aims to highlight certain key aspects of how the integration works.
+
+<p><i>We assume a working profficiency with XCode and fundamental understanding of iOS development. Knowledge of <code>Objective-C</code> and <code>C</code> programming, along with the basics of OpenGL (which is used for rendering) is assumed.</i>
+
+<h2>Build Set-up</h2>
+
+<p>In order to start, you'll need to first git clone the GitHub <a href="https://github.com/machineswithvision/invx-sdk-ios">iOS InVX SDK repository</a>. 
+
+<p>As a reminder (and in case you are unfamiliar with git) you should just change to a suitable directory locally on your development machine and type on the command line: 
+
+<pre>
+git clone git@github.com:machineswithvision/invx-sdk-ios.git
+</pre>
+
+<p>(Alternatively, Github provides a <a href="https://github.com/machineswithvision/invx-sdk-ios/archive/master.zip">pre-pacakged project ZIP</a>).
+
+<p>This will create folder called "invx-sdk-ios" which is a copy of the current version on Github. In this you will find two sub-folders - "invx" which contains the actual frameworks, and "vxview" containing the example VxView app source code and project.
+
+<p>If you then double click on the <code>vxview/vxview.xcodeproj</code> this should launch the project in XCode and you should see something resembling this: 
+
+<div class="img-with-text">
+<p><img src="/blog/img/vxview-xcode.png">
+</div>
+
+<p>Notice how the project is organised along conventional iOS default/best practice. The <code>README.md</code> file that accompanies the project details the particular subtleties in linking and including embedded (so called "dynamic") frameworks, and how the simulator vs. device versions of the frameworks can be swapped in/or out depending on the deployment target. We recommend you take a moment to glance over that at some point and see how the build is exactly configured (and what you would have to do to include the framework in your own apps)... 
+
+<p>But for the moment, all things being well, you should simply just be able to hit the build button (technically  &#8984;-B) and see everything compile and link.
+
+<h2>A Quick Code Summary</h2>
+
+<p>All the interesting code in the project is in the file <code>ViewController.m</code>. This implements the class <code>ViewController</code> defined in the respective header file that inherits from the GLKit <code>GLKViewController</code> and implements the <code>&lt;AVCaptureVideoDataOutputSampleBufferDelegate&gt;</code> protocol for video output. 
+
+<p>Put simply, this means the class inherits the <code>(void)glkView:(GLKView *)view drawInRect:(CGRect)rect</code> and <code>(void)update</code> OpenGL methods that are responsible for updating and rendering OpenGL commands, while at the same time the class needs to set-up and provide an implementation of the <code>(void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)</code> method to be responsible for responding to an incoming frame of video.
+
+<p>The entire App is thus geared towards receiving video frames, extracting the image data, processing it for edges, then displaying the original frame with the extracted edges overlaid on top. 
+
+<p>This class then has the following internal interface:
+
+{% highlight objc %}
+
+@interface ViewController ()
+{
+  // AV..
+
+  AVCaptureSession* _session;
+  CGFloat _screenWidth;
+  CGFloat _screenHeight;
+  size_t _textureWidth;
+  size_t _textureHeight;
+
+  // Core image buffers for input and output...
+  uint8_t* _baseAddress;
+  uint8_t* _edgeAddress;
+
+  // OpenVX...
+
+  vx_context _vxContext;
+  vx_graph _graph;
+
+  // OpenGL edge buffer...
+  Edge* _edges;
+  GLuint _nEdges;
+
+  // OpenGL...
+
+  EAGLContext* _context;
+  GLuint _edgeVBO;
+  GLuint _videoProgram;
+  GLuint _edgesProgram;
+  CVOpenGLESTextureCacheRef _videoTextureCache;
+  CVOpenGLESTextureRef _texture;
+}
+
+
+{% endhighlight %}
+
+<p>The really interesting key attributes are the <code>uint8_t* _baseAddress</code>, <code>uint8_t* _edgeAddress</code> and the corresponding <code>Edge* _edges</code>. These respectively represent and store the current interleaved image bytes, and the resulting coordinates of detected edges. There are also a set of core OpenGL attributes that allow us to reference vertex buffers and shader programs and textures that allow us to then render these structures. The method declarations that follow this definition are then mainly concerned then with the necessary setup and initialisation of these OpenGL references. 
+
+<h2>The OpenVX Core</h2>
+
+<p>There are two methods that sit at the core of the App which use OpenVX - one to define the processing graph so that it receives the <code>_baseAddress</code> image bytes and generates its output to the <code>_edgeAddress</code> bytes, and the other that verifies and runs this graph and updates the <code>_edges</code> with the result.  
+
+<p>Firstly then, there is the <code>setupCannyGraph</code> method. This is where we specify actual OpenVX code in order to define a graph to perform the actual Canny edge operation. Let us break this method down:
+
+{% highlight c %}
+
+- (void)setupCannyGraph:(vx_context)context width:(int)width height:(int)height
+{
+  // Describe the input image data format.. // NOTE rgba = 4 depth
+  vx_imagepatch_addressing_t in_addrs[] = {
+    {width,height,sizeof(vx_uint8)*4,width * sizeof(vx_uint8)*4,VX_SCALE_UNITY,VX_SCALE_UNITY, 1, 1}
+  };
+
+  void* in_ptrs[] = { // RGB data is interleaved bytes...
+    _baseAddress
+  };
+
+  // Create an input image mapped to host memory
+  vx_image _inputimg = vxCreateImageFromHandle(context, VX_DF_IMAGE_RGB, in_addrs, in_ptrs, VX_IMPORT_TYPE_HOST);
+
+  if (vxGetStatus((vx_reference)_inputimg) != VX_SUCCESS)
+  {
+    vxReleaseImage(&_inputimg);
+  }
+
+  // Create an output image as well from buffer...
+  vx_imagepatch_addressing_t out_addrs[] = {
+    {width, height, sizeof(vx_uint8), width*sizeof(vx_uint8), VX_SCALE_UNITY, VX_SCALE_UNITY, 1, 1}
+  };
+
+  void* out_ptrs[] = { // This is where we will write the edges to...
+    _edgeAddress
+  };
+
+  vx_image _edgesimg = vxCreateImageFromHandle(context, VX_DF_IMAGE_U8, out_addrs, out_ptrs, VX_IMPORT_TYPE_HOST);
+
+  if (vxGetStatus((vx_reference)_edgesimg) != VX_SUCCESS)
+  {
+    vxReleaseImage(&_edgesimg);
+  }
+  
+{% endhighlight %}
+
+<p>Here we create a <code>vx_image _inputimg</code> given the data (the <code>_baseAddress</code> bytes) already exists. This is specified by the <code>vxCreateImageFromHandle</code> method which requires two indexed arrays with entries for every plane of image data. Here the data is interleaved - as specified by <code>VX_DF_IMAGE_RGB</code> - so there is only plane of data, with the height, width, size and stride as specified by the single entry in the <code>addrs</code> array.
+
+<p>Similarly, we do the same for the output in <code>vx_image _edgesimg</code> - but this only has a single plane of data specified by <code>VX_DF_IMAGE_U8</code>. In both of these cases the actually memory was assigned earlier during the <code>viewDidLoad</code> method. 
+
+<p>Having created the input and output memory space, we can now build the graph:
+
+{% highlight c %}
+
+  // Create an OpenVX graph
+  _graph = vxCreateGraph(context);
+  if (!_graph) {
+    NSLog(@"ERROR: failed to create graph!\n");
+    return;
+  }
+
+  // And some virtual images to use.
+  vx_image virts[] = {
+    vxCreateVirtualImage(_graph,0,0,VX_DF_IMAGE_IYUV),
+    vxCreateVirtualImage(_graph,0,0,VX_DF_IMAGE_U8),
+  };
+
+  if (_inputimg && _edgesimg) // Only proceed if images were created successfully
+  {
+    // Add a color convert node to the graph, reading from the input image
+    if (!vxColorConvertNode(_graph, _inputimg, virts[0]))
+    {
+      NSLog(@"ERROR: failed to create color convert node!\n");
+      [self releaseCanny];
+    }
+
+    // Add a channel convert node to the graph
+    if (!vxChannelExtractNode(_graph, virts[0], VX_CHANNEL_Y,virts[1]))
+    {
+      NSLog(@"ERROR: failed to create channel extract node!\n");
+      [self releaseCanny];
+    }
+
+    vx_threshold hyst = vxCreateThreshold(context, VX_THRESHOLD_TYPE_RANGE, VX_TYPE_UINT8);
+    vx_int32 lower = 50, upper = 100;
+    vxSetThresholdAttribute(hyst, VX_THRESHOLD_ATTRIBUTE_THRESHOLD_LOWER, &lower, sizeof(lower));
+    vxSetThresholdAttribute(hyst, VX_THRESHOLD_ATTRIBUTE_THRESHOLD_UPPER, &upper, sizeof(upper));
+
+    // Add a Canny node to the graph, linking the graysale and edges images
+    if (!vxCannyEdgeDetectorNode(_graph, virts[1], hyst, 3, VX_NORM_L1, _edgesimg))
+    {
+      NSLog(@"ERROR: failed to create canny node!\n");
+      [self releaseCanny];
+    }
+
+  }
+
+{% endhighlight %}
+
+<p>We use <code>vxCreateGraph</code> first and also create a number of intermediate virtual <code>vx_image</code>'s - one to store the result of converting the RGB data to a YUV representation, and one to extract the grayscale channel of this (the <code>VX_CHANNEL_Y</code>. 
+
+<p>Following this, we then build the graph. To do this we use the respective <code>*Node</code> variations of the key kernel methods: <code>vxColorConvertNode</code>, <code>vxChannelExtractNode</code> and <code>vxCannyEdgeDetectorNode</code>. In the later case, we also have to specify a threshold range for the hysteresis function - using the appropriately named structure <code>vx_threshold</code>. 
+
+<p>In each case the node is added to the graph. Once created - we can use it multiple times in the second method of note <code>doCanny</code>: 
+
+{% highlight c %}
+- (void) doCanny
+{
+  vx_status status = VX_FAILURE;
+  if (_graph) {
+
+    // Verify the graph for safe execution
+    if ((status=vxVerifyGraph(_graph)) != VX_SUCCESS) {
+      NSLog(@"ERROR: failed to verify graph! vx_status: %i\n",status);
+      vxVerifyGraph(_graph);
+      return;
+    }
+
+    // Execute the graph;
+    // Report if the graph failed to execute
+    if ((status=vxProcessGraph(_graph)) != VX_SUCCESS) {
+      NSLog(@"ERROR: failed to run graph! vx_status: %i\n",status);
+      return;
+    }
+
+{% endhighlight %}
+
+<p>This method checks first the graph has been initialised and then uses the <code>vxVerifyGraph</code> to check it. If everything is OK - the graph is then run using the <code>vxProcessGraph</code> method.
+
+<p>On completion, the mapped output memory in <code>_edgeAddress</code> will contain the result.  
+
+{% highlight c %}
+  // Convert to edges (really, would be better if canny graph returned these directly)...
+
+  _nEdges = 0;
+
+  uint8_t pixel;
+  GLuint checked = 0;
+
+  for (int y=0;y<640;y++) // Hardcoded dimensions here - look out!
+  {
+    for (int x=0;x<480;x++)
+    {
+      pixel = _edgeAddress[checked];
+      checked++;
+      if (pixel!=0) // I.e. is part of a detected edge!
+      {
+        _edges[_nEdges].x = -((GLfloat)-1.0+ ((float)x/(float)480)*2.0); // image coords are neg-x
+        _edges[_nEdges].y = (GLfloat)-1.0+ ((float)y/(float)640)*2.0;
+        _nEdges++;
+        if (_nEdges==MAX_EDGES) // Jump out if hit maximum hard-coded limit!
+          goto esc;
+      }
+    }
+  }
+esc:
+  return;
+
+{% endhighlight %}
+
+<p>So now the edges have been extracted - but we need to convert the image representation into a set of <i>(x,y)</i> coordinates that we can render directly using OpenGL. This might not be very efficient in this case, but our intention here is to also illustrate how to access processed OpenVX image data. An alternative for this App would be instead to simply show the <code>_edgesimg</code> image directly (say in a UIImageView) which works just as well.
+
+<h2>Accessing Video Data</h2>
+
+<p>For the rest of the App code - it's probably helpful to understand as well how we access the incoming frames of video data. This is performed in the implementation of the <code>(void)captureOutput:(AVCaptureOutput*)</code> method:   
+
+{% highlight c %}
+- (void)captureOutput:(AVCaptureOutput *)captureOutput
+didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
+fromConnection:(AVCaptureConnection *)connection
+{
+  CVImageBufferRef _pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+
+  // Lock the pixel buffer
+  if(kCVReturnSuccess != CVPixelBufferLockBaseAddress(_pixelBuffer,0)){
+    NSLog(@"Unable to lock image buffer.");
+  }
+
+  // Record this data (and how to rotate it)...
+  size_t width = CVPixelBufferGetWidth(_pixelBuffer);
+  size_t height = CVPixelBufferGetHeight(_pixelBuffer);
+  size_t bytesPerRow = CVPixelBufferGetBytesPerRow(_pixelBuffer);
+  size_t bytesPerRowOut = 4*height*sizeof(unsigned char);
+
+  // Have to rotate this here as pixelBuffer is always passed in *landscape* (even if filming in portrait mode)...
+  @synchronized(self){
+    vImage_Buffer ibuff = { CVPixelBufferGetBaseAddress(_pixelBuffer), height, width, bytesPerRow};
+    vImage_Buffer obuff = { _baseAddress, width, height, bytesPerRowOut}; // Note flip height<->width AND write to _baseAddress
+    uint8_t rotationConstant = 1; // 1=rotate 90deg counterclock 2=180 3=270
+    uint8_t blackback[4] = { 1,0,0,0 };
+    vImage_Error imgerr= vImageRotate90_ARGB8888 (&ibuff, &obuff, rotationConstant, blackback ,0);
+    if (imgerr != kvImageNoError) NSLog(@"%ld", imgerr);
+  }
+
+  //Unlock the image buffer
+  CVPixelBufferUnlockBaseAddress(_pixelBuffer,0);
+{% endhighlight %}
+
+<p>Of primary interest - beyond the standard way in which the CoreVideo <code>CV...</code> methods can be used to return and query a pixel buffer of bytes - is the necessary bit of work contained in the <code>@synchronized</code> block that actually copies the bytes to the <code>_baseAddress</code>. Due to a quirk in the way that the CoreVideo methods work, it doesn't matter if the device is orientated in portrait or landscape: <b>the returned bytes will always be arrayed in landscape</b>. Consequently, because this app works in portrait mode (in its expectation of the texture orientation for the OpenGL) we have to perform a quick call to <code>vImageRotate90</code> to make it so. 
+
+<h2>Displaying Results</h2>
+
+<p>Lastly, let's ultimately describe how the results are rendered. Remember that there are lots of other methods in the class that have been used to create the OpenGL context and initialise references to texture and vertex buffer objects - so now all that is then required is a method to actually invoke the Canny edge detector and update the edges buffer. 
+
+<p>That method is the inherited <code>(void)update</code>:
+
+{% highlight c %}
+- (void)update
+{
+  @synchronized(self){
+    if (_baseAddress!=nil) [self doCanny];
+
+    // Update buffer with these edges...
+    glBufferData(GL_ARRAY_BUFFER, _nEdges * sizeof(Edge), _edges, GL_DYNAMIC_DRAW);
+  }
+}
+{% endhighlight %}
+
+<p> This does the invocation to perform the edge detection, then loads the edges buffer with the latest results, which in turn is then used in the in key rendering method <code>(void)glkView</code>: 
+
+{% highlight c %}
+- (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
+{
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glUseProgram(_videoProgram); // Use this to draw video
+
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+  glUseProgram(_edgesProgram); // Use this to draw edges
+
+  glDrawArrays(GL_POINTS, 0, _nEdges);
+}
+{% endhighlight %}
+
+<p>Here we use the OpenGL shader programs one after the other. The first command clears the screen. The next (using the <code>_videoProgram</code> will draw the texture onto a triangular strip defined by the 4 vertices of our texture. The last (using the <code>_edgesProgram</code> will render as points the associated edges vertex buffer (up to the number <code>_nEdges</code>). 
+
+<h2>Conclusion</h2>
+
+<p>And that's it! Hopefully this post will enhance any understanding of the example VxView project and the crucial aspects of how to actually get data in and out of OpenVX. 
+
+<p>Given that was the primary intention - this is probably not the most efficient example of how best to communicate and trade-off the processing of the data. Further considerations for tweaks such as (re)using texture memory and further multi-threading may produce a more efficient version. 
+
+<p>However, the bottom line with efficiency is the internal optimisations performed by InVX. On that note, a final exercise you can do with this example is to try leaving out the <code>libinvx.framework</code> from the list of embedded binaries in the project. If you do that, you will see immediately how much slower the App will run! Bottom line: on my iPhone 6, the non acclerated version runs about 3fps, whereas the inclusion of the accelerated InVX lib speeds this up to 30fps. 
+
+</div>
+</div>
+</div>

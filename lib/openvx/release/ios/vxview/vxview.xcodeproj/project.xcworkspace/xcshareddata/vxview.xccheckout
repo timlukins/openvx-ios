@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>B2E78B68-320D-4D4E-993C-1B59D2FAAEAC</string>
+	<key>IDESourceControlProjectName</key>
+	<string>vxview</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>401F89FC9A3072B5248ACB037F5A63551B6A9AAD</key>
+		<string>github.com:machineswithvision/invx.git</string>
+		<key>DB7CB0940A7DAABECC8571D30B9D5B45CD224883</key>
+		<string>github.com:machineswithvision/invx-sdk-ios.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>vxview/vxview.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>401F89FC9A3072B5248ACB037F5A63551B6A9AAD</key>
+		<string>../../../../invx</string>
+		<key>DB7CB0940A7DAABECC8571D30B9D5B45CD224883</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>github.com:machineswithvision/invx-sdk-ios.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>DB7CB0940A7DAABECC8571D30B9D5B45CD224883</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>401F89FC9A3072B5248ACB037F5A63551B6A9AAD</string>
+			<key>IDESourceControlWCCName</key>
+			<string>invx</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>DB7CB0940A7DAABECC8571D30B9D5B45CD224883</string>
+			<key>IDESourceControlWCCName</key>
+			<string>invx-sdk-ios</string>
+		</dict>
+	</array>
+</dict>
+</plist>

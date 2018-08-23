@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>57472535-9733-4E01-A8AA-00F4ED3FA7C1</string>
+	<key>IDESourceControlProjectName</key>
+	<string>gtest</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>401F89FC9A3072B5248ACB037F5A63551B6A9AAD</key>
+		<string>github.com:machineswithvision/invx.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>test/lib/gtest-1.7.0/xcode/gtest.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>401F89FC9A3072B5248ACB037F5A63551B6A9AAD</key>
+		<string>../../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>github.com:machineswithvision/invx.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>401F89FC9A3072B5248ACB037F5A63551B6A9AAD</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>401F89FC9A3072B5248ACB037F5A63551B6A9AAD</string>
+			<key>IDESourceControlWCCName</key>
+			<string>invx</string>
+		</dict>
+	</array>
+</dict>
+</plist>

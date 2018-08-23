@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "DB7CB0940A7DAABECC8571D30B9D5B45CD224883",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "DB7CB0940A7DAABECC8571D30B9D5B45CD224883" : 0,
+    "401F89FC9A3072B5248ACB037F5A63551B6A9AAD" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "B2E78B68-320D-4D4E-993C-1B59D2FAAEAC",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "DB7CB0940A7DAABECC8571D30B9D5B45CD224883" : "invx-sdk-ios",
+    "401F89FC9A3072B5248ACB037F5A63551B6A9AAD" : "invx"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "vxview",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "vxview\/vxview.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:machineswithvision\/invx.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "401F89FC9A3072B5248ACB037F5A63551B6A9AAD"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:machineswithvision\/invx-sdk-ios.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "DB7CB0940A7DAABECC8571D30B9D5B45CD224883"
+    }
+  ]
+}
